@@ -82,6 +82,15 @@ const DB = {
       this.save();
     }
   },
+
+  reorderTasks(ideaId, fromIdx, toIdx) {
+    const idea = this.getIdea(ideaId);
+    if (idea) {
+      const [moved] = idea.tasks.splice(fromIdx, 1);
+      idea.tasks.splice(toIdx, 0, moved);
+      this.save();
+    }
+  },
 };
 
 // ───── TASK AUTO-GENERATOR ─────
@@ -257,6 +266,87 @@ function showToast(msg, type = '') {
   setTimeout(() => { el.className = 'toast hidden'; }, 2800);
 }
 
+// ───── CONFETTI ─────
+function launchConfetti() {
+  const count = 100;
+  const defaults = { origin: { y: 0.7 }, zIndex: 10000 };
+
+  function fire(particleRatio, opts) {
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0'; canvas.style.left = '0';
+    canvas.style.width = '100%'; canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.zIndex = '9999';
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const colors = ['#1A73E8', '#4A8FF7', '#34A853', '#FBBC05', '#EA4335'];
+    
+    for (let i = 0; i < count * particleRatio; i++) {
+      particles.push({
+        x: canvas.width / 2,
+        y: canvas.height * 0.8,
+        vx: (Math.random() - 0.5) * 15,
+        vy: (Math.random() * -15) - 10,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        r: Math.random() * 6 + 4,
+        t: 0
+      });
+    }
+
+    function update() {
+      ctx.clearRect(0,0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.5; // gravity
+        p.t += 0.01;
+        ctx.beginPath();
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        if (p.y > canvas.height) particles.splice(i, 1);
+      }
+      if (particles.length) requestAnimationFrame(update);
+      else document.body.removeChild(canvas);
+    }
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    update();
+  }
+
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+}
+
+// ───── EXPORT ─────
+const Exporter = {
+  toText(id) {
+    const idea = DB.getIdea(id);
+    if (!idea) return;
+    let txt = `IDEALOW PLAN: ${idea.title.toUpperCase()}\n`;
+    txt += `Category: ${idea.category} | Priority: ${idea.priority}\n`;
+    if (idea.description) txt += `Description: ${idea.description}\n`;
+    txt += `\nTASKS:\n`;
+    idea.tasks.forEach((t, i) => {
+      txt += `${t.done ? '[x]' : '[ ]'} ${t.text}\n`;
+    });
+    
+    navigator.clipboard.writeText(txt).then(() => {
+      showToast('Plan gekopieerd naar klembord! 📋', 'success');
+    });
+  },
+  
+  toPdf() {
+    window.print();
+  }
+};
+
 // ───── RENDERER ─────
 const Renderer = {
 
@@ -428,6 +518,11 @@ const Renderer = {
 
         <!-- Actions -->
         <div class="detail-actions" id="detail-actions">
+          <div class="action-group">
+            <button class="btn-secondary" id="btn-export-txt">📄 Export Tekst</button>
+            <button class="btn-secondary" id="btn-export-pdf">🖨️ PDF / Print</button>
+          </div>
+          
           ${!idea.archived ? `
             <button class="btn-complete" id="btn-complete" ${pct < 100 ? 'disabled' : ''}>
               ✅ Plan afronden & archiveren
@@ -468,16 +563,28 @@ const Renderer = {
       const li = document.createElement('li');
       li.className = `task-item ${task.done ? 'completed' : ''}`;
       li.setAttribute('data-task-id', task.id);
+      li.setAttribute('draggable', 'true');
       li.innerHTML = `
+        <div class="task-item-drag-handle">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </div>
         <input type="checkbox" class="task-checkbox" ${task.done ? 'checked' : ''} />
         <span class="task-text">${escHtml(task.text)}</span>
         <span class="task-prio-dot dot-${task.prio || 'medium'}"></span>
         ${!idea.archived ? `<button class="task-delete-btn" title="Taak verwijderen">✕</button>` : ''}
       `;
 
+      // Drag events
+      li.addEventListener('dragstart', () => li.classList.add('dragging'));
+      li.addEventListener('dragend', () => li.classList.remove('dragging'));
+
       const cb = li.querySelector('.task-checkbox');
       cb && cb.addEventListener('change', () => {
         DB.toggleTask(ideaId, task.id);
+        const updated = DB.getIdea(ideaId);
+        const newPct = getProgress(updated);
+        if (newPct === 100) launchConfetti();
+        
         this.renderDetail(ideaId);
         this.renderStats();
       });
@@ -542,6 +649,32 @@ const Renderer = {
         showToast('Plan verwijderd', '');
         App.navigate('dashboard');
       }
+    });
+
+    // Export events
+    document.getElementById('btn-export-txt')?.addEventListener('click', () => Exporter.toText(ideaId));
+    document.getElementById('btn-export-pdf')?.addEventListener('click', () => Exporter.toPdf());
+
+    // Drag & Drop reorder
+    const list = document.getElementById('tasks-list');
+    list.addEventListener('dragover', e => {
+      e.preventDefault();
+      const dragging = document.querySelector('.dragging');
+      const siblings = [...list.querySelectorAll('.task-item:not(.dragging)')];
+      let nextSibling = siblings.find(sib => e.clientY <= sib.getBoundingClientRect().top + sib.offsetHeight / 2);
+      list.insertBefore(dragging, nextSibling);
+    });
+
+    list.addEventListener('drop', () => {
+      const newItems = [...list.querySelectorAll('.task-item')];
+      const idea = DB.getIdea(ideaId);
+      const newTasks = newItems.map(item => {
+        const tid = item.getAttribute('data-task-id');
+        return idea.tasks.find(t => t.id === tid);
+      });
+      idea.tasks = newTasks;
+      DB.save();
+      this.renderStats();
     });
   },
 };

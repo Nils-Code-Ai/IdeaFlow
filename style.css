@@ -925,6 +925,63 @@ body.dark-mode .theme-toggle::after { transform: translateX(16px); }
 }
 
 /* ───── TASKS SECTION ───── */
+/* Drag & Drop */
+.task-item.dragging {
+  opacity: 0.5;
+  background: var(--surface-2);
+  border: 1px dashed var(--blue-500);
+}
+
+.task-item-drag-handle {
+  cursor: grab;
+  padding: 4px;
+  color: var(--text-ter);
+  display: flex;
+  align-items: center;
+  margin-right: -4px;
+}
+
+.task-item-drag-handle:active { cursor: grabbing; }
+
+/* Micro-animations */
+.view {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--t-med), transform var(--t-med);
+  pointer-events: none;
+}
+
+.view.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.modal-overlay {
+  transition: opacity var(--t-med);
+}
+
+.modal {
+  transform: scale(0.95);
+  transition: transform var(--t-med);
+}
+
+.modal-overlay:not(.hidden) .modal {
+  transform: scale(1);
+}
+
+/* Print Styles */
+@media print {
+  #sidebar, #main-header, .detail-actions, .add-task-form, .toast, .modal-overlay {
+    display: none !important;
+  }
+  #app { grid-template-columns: 1fr; }
+  #main { padding: 0; }
+  .view { opacity: 1 !important; transform: none !important; }
+  .detail-card { box-shadow: none; border: 1px solid #ddd; }
+  body { background: white !important; color: black !important; }
+}
+
 .tasks-section {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -1094,9 +1151,17 @@ body.dark-mode .theme-toggle::after { transform: translateX(16px); }
 
 /* Bottom actions */
 .detail-actions {
+  margin-top: 32px;
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
   flex-wrap: wrap;
+}
+
+.action-group {
+  display: flex;
+  gap: 8px;
 }
 
 .btn-complete {
