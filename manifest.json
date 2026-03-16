@@ -1,0 +1,17 @@
+{
+  "name": "IdeaFlow",
+  "short_name": "IdeaFlow",
+  "description": "Zet jouw ideeën om in concrete plannen en taken",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFF",
+  "theme_color": "#1A73E8",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIgZmlsbD0iIzFBNzNFOCIvPjxwYXRoIGQ9Ik05NiAzMkM2OS40OSAzMiA0OCA1My40OSA0OCA4MGMwIDE2LjkxIDguNjQgMzEuODQgMjEuNzYgNDAuNTZWMTI4YTQgNCAwIDAgMCA0IDRoNDQuNDhhNCA0IDAgMCAwIDQtNHYtNy40NEMxMzUuMzYgMTExLjg0IDE0NCA5Ni45MSAxNDQgODBjMC0yNi41MS0yMS40OS00OC00OC00OHoiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuOSIvPjxyZWN0IHg9IjcyIiB5PSIxMzYiIHdpZHRoPSI0OCIgaGVpZ2h0PSIxNiIgcng9IjgiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuNyIvPjxyZWN0IHg9IjgwIiB5PSIxNTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIxMiIgcng9IjYiIGZpbGw9IndoaXRlIiBvcGFjaXR5PSIuNSIvPjwvc3ZnPg==",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

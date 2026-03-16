@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="IdeaFlow – Zet jouw ideeën om in concrete plannen, taken en stappen." />
+  <title>IdeaFlow – Van Idee naar Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ======= SIDEBAR ======= -->
+    <aside id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.686 2 6 4.686 6 8c0 2.123 1.09 3.993 2.75 5.12V15a1 1 0 0 0 1 1h4.5a1 1 0 0 0 1-1v-1.88A6 6 0 0 0 12 2z" fill="#fff" opacity=".9"/><rect x="9" y="17" width="6" height="2" rx="1" fill="#fff" opacity=".7"/><rect x="10" y="20" width="4" height="1.5" rx=".75" fill="#fff" opacity=".5"/></svg>
+        </div>
+        <span class="brand-name">IdeaFlow</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" id="nav-dashboard" data-view="dashboard">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="2" fill="currentColor" opacity=".8"/><rect x="13" y="3" width="8" height="8" rx="2" fill="currentColor" opacity=".5"/><rect x="3" y="13" width="8" height="8" rx="2" fill="currentColor" opacity=".5"/><rect x="13" y="13" width="8" height="8" rx="2" fill="currentColor" opacity=".3"/></svg>
+          </span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-archive" data-view="archive">
+          <span class="nav-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6H4a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1z" fill="currentColor" opacity=".8"/><path d="M19 10H5v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7z" fill="currentColor" opacity=".4"/><path d="M10 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span>Archief</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-stats-mini">
+          <div class="mini-stat">
+            <span id="mini-active" class="mini-val">0</span>
+            <span class="mini-lbl">Actief</span>
+          </div>
+          <div class="mini-divider"></div>
+          <div class="mini-stat">
+            <span id="mini-done" class="mini-val">0</span>
+            <span class="mini-lbl">Klaar</span>
+          </div>
+        </div>
+        <button id="btn-new-idea" class="btn-new">
+          <span class="btn-new-icon">+</span>
+          <span>Nieuw Idee</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ======= MAIN CONTENT ======= -->
+    <main id="main">
+
+      <!-- Header -->
+      <header id="main-header">
+        <div class="header-left">
+          <button id="back-btn" class="back-btn hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Terug
+          </button>
+          <div class="header-titles">
+            <h1 id="view-title">Dashboard</h1>
+            <p id="view-subtitle">Overzicht van jouw ideeën &amp; plannen</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="search-wrap" id="search-wrap">
+            <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="search-input" placeholder="Zoek idee..." autocomplete="off" />
+          </div>
+          <button id="header-new-btn" class="btn-primary" title="Nieuw idee aanmaken">
+            <span>+ Nieuw Idee</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ===== DASHBOARD VIEW ===== -->
+      <div id="view-dashboard" class="view active">
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card stat-blue">
+            <div class="stat-icon">💡</div>
+            <div class="stat-data">
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-label">Totale Ideeën</div>
+            </div>
+          </div>
+          <div class="stat-card stat-indigo">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-data">
+              <div class="stat-value" id="stat-active">0</div>
+              <div class="stat-label">Actieve Plannen</div>
+            </div>
+          </div>
+          <div class="stat-card stat-green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-data">
+              <div class="stat-value" id="stat-done">0</div>
+              <div class="stat-label">Afgerond</div>
+            </div>
+          </div>
+          <div class="stat-card stat-amber">
+            <div class="stat-icon">📋</div>
+            <div class="stat-data">
+              <div class="stat-value" id="stat-tasks">0</div>
+              <div class="stat-label">Open Taken</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter + Section Header -->
+        <div class="section-header">
+          <h2 class="section-title">Mijn Plannen</h2>
+          <div class="filter-tabs" id="filter-tabs">
+            <button class="ftab active" data-filter="all">Alle</button>
+            <button class="ftab" data-filter="active">Actief</button>
+            <button class="ftab" data-filter="done">Afgerond</button>
+          </div>
+        </div>
+
+        <div id="ideas-grid" class="ideas-grid"></div>
+
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="48" fill="#EEF4FF"/>
+              <path d="M50 20C37.85 20 28 29.85 28 42c0 7.45 3.6 14.08 9.17 18.22V64a2 2 0 0 0 2 2H60.83a2 2 0 0 0 2-2v-3.78A22.02 22.02 0 0 0 72 42c0-12.15-9.85-22-22-22z" fill="#1A73E8" opacity=".2"/>
+              <circle cx="50" cy="38" r="6" fill="#1A73E8" opacity=".5"/>
+              <rect x="42" y="66" width="16" height="4" rx="2" fill="#1A73E8" opacity=".3"/>
+              <rect x="44" y="72" width="12" height="3" rx="1.5" fill="#1A73E8" opacity=".2"/>
+            </svg>
+          </div>
+          <h3>Nog geen ideeën</h3>
+          <p>Klik op <strong>"+ Nieuw Idee"</strong> om je eerste plan aan te maken.</p>
+          <button class="btn-primary" id="empty-cta">✨ Eerste idee aanmaken</button>
+        </div>
+      </div>
+
+      <!-- ===== ARCHIVE VIEW ===== -->
+      <div id="view-archive" class="view">
+        <div class="section-header">
+          <h2 class="section-title">Afgeronde Plannen</h2>
+        </div>
+        <div id="archive-grid" class="ideas-grid"></div>
+        <div id="archive-empty" class="empty-state hidden">
+          <div class="empty-illustration">
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="48" fill="#EEF4FF"/>
+              <rect x="20" y="30" width="60" height="8" rx="4" fill="#1A73E8" opacity=".2"/>
+              <rect x="20" y="44" width="60" height="28" rx="4" fill="#1A73E8" opacity=".1"/>
+              <path d="M43 58l5 5 9-9" stroke="#1A73E8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+            </svg>
+          </div>
+          <h3>Archief is leeg</h3>
+          <p>Afgeronde plannen verschijnen hier automatisch.</p>
+        </div>
+      </div>
+
+      <!-- ===== DETAIL VIEW ===== -->
+      <div id="view-detail" class="view">
+        <!-- Dynamisch geladen -->
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ======= MODAL: NIEUW IDEE ======= -->
+  <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-title">✨ Nieuw Idee</h2>
+        <button id="modal-close" class="btn-icon-close" aria-label="Sluiten">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="idea-title" class="form-label">Jouw idee <span class="required">*</span></label>
+          <input
+            type="text"
+            id="idea-title"
+            class="form-input"
+            placeholder="Bijv: Een portfolio-website bouwen..."
+            maxlength="120"
+            autocomplete="off"
+          />
+          <div class="char-count"><span id="char-count">0</span>/120</div>
+        </div>
+
+        <div class="form-group">
+          <label for="idea-desc" class="form-label">Beschrijving <span class="optional">(optioneel)</span></label>
+          <textarea
+            id="idea-desc"
+            class="form-input form-textarea"
+            placeholder="Geef meer context over je idee..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Categorie</label>
+            <div class="cat-picker" id="cat-picker">
+              <button class="cat-btn active" data-cat="💡 Idee">💡 Idee</button>
+              <button class="cat-btn" data-cat="🚀 Project">🚀 Project</button>
+              <button class="cat-btn" data-cat="📚 Leren">📚 Leren</button>
+              <button class="cat-btn" data-cat="💼 Werk">💼 Werk</button>
+              <button class="cat-btn" data-cat="🎨 Creatief">🎨 Creatief</button>
+              <button class="cat-btn" data-cat="💪 Persoonlijk">💪 Persoonlijk</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Prioriteit</label>
+            <div class="prio-picker" id="prio-picker">
+              <button class="prio-btn" data-prio="laag">🟢 Laag</button>
+              <button class="prio-btn active" data-prio="medium">🟡 Medium</button>
+              <button class="prio-btn" data-prio="hoog">🔴 Hoog</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="autogen-section">
+          <div class="autogen-header">
+            <div class="autogen-label-group">
+              <span class="autogen-badge">🤖 AI</span>
+              <div>
+                <strong>Auto-genereer taken</strong>
+                <p>IdeaFlow genereert automatisch relevante taken op basis van je idee.</p>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-autogen" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-cancel" class="btn-secondary">Annuleer</button>
+        <button id="btn-create" class="btn-primary">
+          <span class="btn-spinner hidden" id="create-spinner"></span>
+          ✨ Plan aanmaken
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="alert" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
