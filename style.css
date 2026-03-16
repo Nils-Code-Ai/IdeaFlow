@@ -75,6 +75,21 @@
   --t-slow: 400ms var(--ease);
 }
 
+/* ───── Dark Mode Variables ───── */
+body.dark-mode {
+  --bg:         var(--gray-900);
+  --surface:    var(--gray-800);
+  --surface-2:  var(--gray-700);
+  --border:     var(--gray-700);
+  --text-pri:   var(--gray-50);
+  --text-sec:   var(--gray-400);
+  --text-ter:   var(--gray-500);
+
+  --gray-50:    #0F172A;
+  --gray-100:   #1E293B;
+  --gray-200:   #334155;
+}
+
 /* ───── Reset & Base ───── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -193,6 +208,48 @@ img { max-width: 100%; }
   flex-direction: column;
   gap: 12px;
 }
+
+/* Theme Toggle */
+.theme-toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.07);
+  border-radius: var(--r-md);
+  margin-bottom: 4px;
+}
+
+.theme-label {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle {
+  width: 36px; height: 20px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 99px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--t-fast);
+}
+
+body.dark-mode .theme-toggle { background: var(--blue-500); }
+body.dark-mode .theme-toggle::after { transform: translateX(16px); }
 
 .sidebar-stats-mini {
   display: flex;
@@ -654,8 +711,32 @@ img { max-width: 100%; }
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Deadline Badge */
+.deadline-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--gray-100);
+  color: var(--text-sec);
+}
+
+.deadline-urgent {
+  background: rgba(239,68,68,0.1);
+  color: var(--red-500);
+}
+
+.deadline-today {
+  background: rgba(245,158,11,0.1);
+  color: var(--amber-500);
 }
 
 .card-progress {

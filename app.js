@@ -11,6 +11,7 @@ const STATE = {
   searchQuery: '',
   selectedCat: '💡 Idee',
   selectedPrio: 'medium',
+  theme: 'light',
 };
 
 // ───── LOCAL DB ─────
@@ -21,13 +22,16 @@ const DB = {
     try {
       const raw = localStorage.getItem(this.KEY);
       STATE.ideas = raw ? JSON.parse(raw) : [];
+      STATE.theme = localStorage.getItem(this.KEY + '_theme') || 'light';
     } catch (e) {
       STATE.ideas = [];
+      STATE.theme = 'light';
     }
   },
 
   save() {
     localStorage.setItem(this.KEY, JSON.stringify(STATE.ideas));
+    localStorage.setItem(this.KEY + '_theme', STATE.theme);
   },
 
   addIdea(idea) {
@@ -219,8 +223,26 @@ function uid() {
 }
 
 function formatDate(ts) {
+  if (!ts) return '';
   const d = new Date(ts);
   return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function getDeadlineLabel(dateStr) {
+  if (!dateStr) return null;
+  const deadline = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  deadline.setHours(0,0,0,0);
+
+  const diffTime = deadline - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) return { text: `⚠️ ${Math.abs(diffDays)}d te laat`, class: 'deadline-urgent' };
+  if (diffDays === 0) return { text: '⏳ Vandaag!', class: 'deadline-today' };
+  if (diffDays === 1) return { text: '📅 Morgen', class: 'deadline-today' };
+  if (diffDays < 7) return { text: `📅 over ${diffDays} dagen`, class: '' };
+  return { text: `📅 ${formatDate(deadline)}`, class: '' };
 }
 
 function getProgress(idea) {
@@ -259,6 +281,8 @@ const Renderer = {
     const finished = idea.tasks.filter(t => t.done).length;
     const isDone = pct === 100 || idea.archived;
 
+    const pc = getDeadlineLabel(idea.dueDate);
+
     const card = document.createElement('div');
     card.className = 'idea-card';
     card.setAttribute('data-id', idea.id);
@@ -267,6 +291,7 @@ const Renderer = {
         <div class="card-meta">
           <span class="card-cat">${idea.category}</span>
           <span class="card-prio prio-${idea.priority}">${idea.priority.charAt(0).toUpperCase() + idea.priority.slice(1)}</span>
+          ${pc ? `<span class="deadline-badge ${pc.class}">${pc.text}</span>` : ''}
         </div>
         ${isDone ? '<span class="card-done-badge">✅ Afgerond</span>' : ''}
       </div>
@@ -340,6 +365,7 @@ const Renderer = {
     const pct = getProgress(idea);
     const finished = idea.tasks.filter(t => t.done).length;
     const total = idea.tasks.length;
+    const pc = getDeadlineLabel(idea.dueDate);
     const circumference = 175.9;
     const offset = circumference - (pct / 100) * circumference;
 
@@ -360,6 +386,7 @@ const Renderer = {
               <div class="detail-meta">
                 <span class="card-cat">${idea.category}</span>
                 <span class="card-prio prio-${idea.priority}">${idea.priority.charAt(0).toUpperCase() + idea.priority.slice(1)}</span>
+                ${pc ? `<span class="deadline-badge ${pc.class}">${pc.text}</span>` : ''}
                 ${idea.archived ? '<span class="card-done-badge">✅ Afgerond</span>' : ''}
               </div>
               <h2 class="detail-title">${escHtml(idea.title)}</h2>
@@ -531,8 +558,23 @@ const App = {
 
   init() {
     DB.load();
+    this.applyTheme();
     this.bindEvents();
     this.navigate('dashboard');
+  },
+
+  applyTheme() {
+    document.body.classList.toggle('dark-mode', STATE.theme === 'dark');
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-checked', STATE.theme === 'dark');
+    }
+  },
+
+  toggleTheme() {
+    STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
+    this.applyTheme();
+    DB.save();
   },
 
   navigate(view, ideaId = null) {
@@ -595,6 +637,7 @@ const App = {
     overlay.classList.remove('hidden');
     document.getElementById('idea-title').value = '';
     document.getElementById('idea-desc').value = '';
+    document.getElementById('idea-deadline').value = '';
     document.getElementById('char-count').textContent = '0';
     document.getElementById('toggle-autogen').checked = true;
 
@@ -620,10 +663,12 @@ const App = {
   createIdea() {
     const titleEl = document.getElementById('idea-title');
     const descEl  = document.getElementById('idea-desc');
+    const deadEl  = document.getElementById('idea-deadline');
     const autoGen = document.getElementById('toggle-autogen').checked;
 
     const title = titleEl.value.trim();
     const desc  = descEl.value.trim();
+    const dueDate = deadEl.value;
 
     if (!title) {
       titleEl.focus();
@@ -640,6 +685,7 @@ const App = {
       description: desc,
       category: STATE.selectedCat,
       priority: STATE.selectedPrio,
+      dueDate: dueDate,
       tasks,
       archived: false,
       createdAt: Date.now(),
@@ -656,6 +702,9 @@ const App = {
     document.getElementById('btn-new-idea').addEventListener('click', () => this.showModal());
     document.getElementById('header-new-btn').addEventListener('click', () => this.showModal());
     document.getElementById('empty-cta')?.addEventListener('click', () => this.showModal());
+
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
 
     // Modal close
     document.getElementById('modal-close').addEventListener('click', () => this.hideModal());
